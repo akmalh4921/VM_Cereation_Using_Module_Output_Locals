@@ -43,5 +43,5 @@ steps:
       provider: 'azurerm'
       command: 'apply'
       workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
-      commandOptions: '-auto-approve'
+      commandOptions: '-auto-approve -parallelism=2'
       environmentServiceNameAzureRM: 'Azure_Svc'
