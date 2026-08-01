@@ -1,0 +1,47 @@
+name: Using_Modules_Output_locals_VM_Creation
+
+trigger:
+  - main
+
+pool: PipelineAgent
+
+steps:
+  - task: TerraformInstaller@1
+    inputs:
+      terraformVersion: 'latest'
+
+  - task: TerraformTask@5
+    displayName: 'Terraform Init'
+    inputs:
+      provider: 'azurerm'
+      command: 'init'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+      backendServiceArm: 'Azure_Svc'
+      backendAzureRmResourceGroupName: 'rg-pipeline-ak'
+      backendAzureRmStorageAccountName: 'strgadopipeline0107'
+      backendAzureRmContainerName: 'adopipelinecontainer'
+      backendAzureRmKey: 'terraform.tfstate'
+
+  - task: TerraformTask@5
+    displayName: 'Terraform Validate'
+    inputs:
+      provider: 'azurerm'
+      command: 'validate'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+
+  - task: TerraformTask@5
+    displayName: 'Terraform Plan'
+    inputs:
+      provider: 'azurerm'
+      command: 'plan'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+      environmentServiceNameAzureRM: 'Azure_Svc'
+
+  - task: TerraformTask@5
+    displayName: 'Terraform Apply'
+    inputs:
+      provider: 'azurerm'
+      command: 'apply'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+      commandOptions: '-auto-approve'
+      environmentServiceNameAzureRM: 'Azure_Svc'
