@@ -1,0 +1,36 @@
+name: AjeetPipeline
+trigger:
+- main
+
+pool: PipelineAgent
+
+
+steps:
+  - task: TerraformInstaller@1
+    inputs:
+      terraformVersion: 'latest'
+  - task: TerraformTask@5
+    inputs:
+      provider: 'azurerm'
+      command: 'init'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+      backendServiceArm: 'Azure_Svc'
+      backendAzureRmResourceGroupName: 'rg-pipeline-ak'
+      backendAzureRmStorageAccountName: 'strgadopipeline0107'
+      backendAzureRmContainerName: 'adopipelinecontainer'
+      backendAzureRmKey: 'terraform.tfstate'
+  - task: TerraformTask@5
+    inputs:
+      provider: 'azurerm'
+      command: 'plan'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+      environmentServiceNameAzureRM: 'Azure_Svc'
+  - task: TerraformTask@5
+    inputs:
+      provider: 'azurerm'
+      command: 'apply'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+      commandOptions: '-auto-approve -parallelism=2'
+      environmentServiceNameAzureRM: 'Azure_Svc'
+
+
